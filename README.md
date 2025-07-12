@@ -123,9 +123,9 @@
 
 | Role          | Username        | Password  |
 |---------------|----------------|-----------|
-| Admin         | admin          | admin123  |
-| Project Manager | manager      | manager123|
-| Team Member   | member         | member123 |
+| Admin         | admin          | password123  |
+| Project Manager | manager      | password123  |
+| Team Member   | member         | password123 |
 
 ## 🗺️ Routes & API Endpoints
 
