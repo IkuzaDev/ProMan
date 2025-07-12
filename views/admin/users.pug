@@ -1,0 +1,55 @@
+extends ../layout
+
+block content
+  div(class="container mx-auto px-4 py-6")
+    div(class="flex justify-between items-center mb-6")
+      h1(class="text-3xl font-bold") User Management
+      a(href="/admin/users/add" class="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-lg flex items-center")
+        i(class="bx bx-plus mr-2")
+        span Add User
+    
+    div(class="bg-white rounded-lg shadow-md overflow-hidden" data-aos="fade-up")
+      div(class="overflow-x-auto")
+        table(class="min-w-full divide-y divide-gray-200")
+          thead(class="bg-gray-50")
+            tr
+              th(class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Username
+              th(class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Full Name
+              th(class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Email
+              th(class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Role
+              th(class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Created
+              th(class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Actions
+          tbody(class="bg-white divide-y divide-gray-200")
+            if users && users.length > 0
+              each user in users
+                tr(class="hover:bg-gray-50")
+                  td(class="px-6 py-4 whitespace-nowrap")
+                    div(class="flex items-center")
+                      if user.avatar
+                        img(src=user.avatar alt=user.username class="h-8 w-8 rounded-full mr-2")
+                      else
+                        div(class="h-8 w-8 rounded-full bg-indigo-100 text-indigo-500 flex items-center justify-center mr-2")
+                          i(class="bx bx-user")
+                      span(class="font-medium") #{user.username}
+                  td(class="px-6 py-4 whitespace-nowrap") #{user.fullname}
+                  td(class="px-6 py-4 whitespace-nowrap") #{user.email}
+                  td(class="px-6 py-4 whitespace-nowrap")
+                    if user.role === 'admin'
+                      span(class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800") Admin
+                    else if user.role === 'project_manager'
+                      span(class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800") Project Manager
+                    else
+                      span(class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800") Team Member
+                  td(class="px-6 py-4 whitespace-nowrap text-sm text-gray-500") #{new Date(user.created_at).toLocaleDateString()}
+                  td(class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium")
+                    div(class="flex space-x-2")
+                      a(href=`/admin/users/edit/${user.id}` class="text-indigo-600 hover:text-indigo-900" title="Edit")
+                        i(class="bx bx-edit")
+                      a(href=`/admin/users/reset-password/${user.id}` class="text-yellow-600 hover:text-yellow-900" title="Reset Password")
+                        i(class="bx bx-key")
+                      if user.id !== user.id
+                        a(href=`/admin/users/delete/${user.id}` class="text-red-600 hover:text-red-900" title="Delete" onclick="return confirm('Are you sure you want to delete this user?')")
+                          i(class="bx bx-trash")
+            else
+              tr
+                td(colspan="6" class="px-6 py-4 text-center text-gray-500") No users found 

@@ -1,0 +1,41 @@
+extends ../layout
+
+block content
+  div(class="container mx-auto px-4 py-6")
+    h1(class="text-3xl font-bold mb-6") Project Management
+    
+    div(class="bg-white rounded-lg shadow-md overflow-hidden" data-aos="fade-up")
+      div(class="overflow-x-auto")
+        table(class="min-w-full divide-y divide-gray-200")
+          thead(class="bg-gray-50")
+            tr
+              th(class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Project Name
+              th(class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Created By
+              th(class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Status
+              th(class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Progress
+              th(class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Tasks
+              th(class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Created
+              th(class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Actions
+          tbody(class="bg-white divide-y divide-gray-200")
+            if projects && projects.length > 0
+              each project in projects
+                tr(class="hover:bg-gray-50")
+                  td(class="px-6 py-4 whitespace-nowrap")
+                    a(href=`/admin/projects/${project.id}` class="font-medium text-indigo-600 hover:text-indigo-900") #{project.name}
+                  td(class="px-6 py-4 whitespace-nowrap") #{project.creator_name}
+                  td(class="px-6 py-4 whitespace-nowrap")
+                    span(class=`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${project.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`) #{project.status}
+                  td(class="px-6 py-4 whitespace-nowrap")
+                    div(class="w-full bg-gray-200 rounded-full h-2.5 mb-1")
+                      - const progressPercent = Math.round((project.completed_tasks / (project.task_count || 1)) * 100)
+                      div(class="bg-indigo-600 h-2.5 rounded-full" style=`width: ${progressPercent}%`)
+                    span(class="text-xs text-gray-500") #{progressPercent}% (#{project.completed_tasks}/#{project.task_count})
+                  td(class="px-6 py-4 whitespace-nowrap") #{project.task_count}
+                  td(class="px-6 py-4 whitespace-nowrap text-sm text-gray-500") #{new Date(project.created_at).toLocaleDateString()}
+                  td(class="px-6 py-4 whitespace-nowrap text-sm font-medium")
+                    a(href=`/admin/projects/${project.id}` class="text-indigo-600 hover:text-indigo-900" title="View Details")
+                      i(class="bx bx-show mr-2")
+                      span View
+            else
+              tr
+                td(colspan="7" class="px-6 py-4 text-center text-gray-500") No projects found 

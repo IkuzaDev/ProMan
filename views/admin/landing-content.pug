@@ -1,0 +1,98 @@
+extends ../layout
+
+block content
+  div(class="container mx-auto px-4 py-6")
+    div(class="flex justify-between items-center mb-6")
+      h1(class="text-3xl font-bold") Landing Page Content
+      a(href="/admin/landing/add" class="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-lg flex items-center")
+        i(class="bx bx-plus mr-2")
+        span Add Content
+    
+    div(class="bg-white rounded-lg shadow-md p-6 mb-6" data-aos="fade-up")
+      h2(class="text-xl font-semibold mb-4") Hero Section
+      
+      if content && content.filter(item => item.section === 'hero').length > 0
+        div(class="space-y-4")
+          each item in content.filter(item => item.section === 'hero')
+            div(class="border border-gray-200 rounded-lg p-4 flex flex-col md:flex-row")
+              if item.image
+                div(class="md:w-1/3 mb-4 md:mb-0 md:mr-4")
+                  img(src=item.image alt=item.title class="w-full h-auto rounded-lg")
+              div(class="md:flex-1")
+                h3(class="text-lg font-medium mb-2") #{item.title}
+                p(class="text-gray-600 mb-4") #{item.content}
+                if item.button_text
+                  div(class="mb-4")
+                    span(class="text-gray-500") Button: 
+                    span(class="ml-1 px-2 py-1 bg-gray-100 rounded text-sm") #{item.button_text}
+                    span(class="ml-2 text-gray-500") Link: 
+                    span(class="ml-1 text-indigo-600") #{item.button_link}
+                div(class="flex space-x-2 mt-2")
+                  a(href=`/admin/landing/edit/${item.id}` class="text-indigo-600 hover:text-indigo-900" title="Edit")
+                    i(class="bx bx-edit mr-1")
+                    span Edit
+                  a(href=`/admin/landing/delete/${item.id}` class="text-red-600 hover:text-red-900" title="Delete" onclick="return confirm('Are you sure you want to delete this content?')")
+                    i(class="bx bx-trash mr-1")
+                    span Delete
+      else
+        div(class="text-center py-4 border border-dashed border-gray-300 rounded-lg")
+          p(class="text-gray-500 mb-2") No hero content added yet
+          a(href="/admin/landing/add" class="text-indigo-600 hover:text-indigo-800")
+            i(class="bx bx-plus mr-1")
+            span Add Hero Content
+    
+    div(class="bg-white rounded-lg shadow-md p-6 mb-6" data-aos="fade-up" data-aos-delay="100")
+      div(class="flex justify-between items-center mb-4")
+        h2(class="text-xl font-semibold") Features Section
+        a(href="/admin/landing/add" class="text-indigo-600 hover:text-indigo-800")
+          i(class="bx bx-plus mr-1")
+          span Add Feature
+      
+      if content && content.filter(item => item.section === 'feature').length > 0
+        div(class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4")
+          each item in content.filter(item => item.section === 'feature')
+            div(class="border border-gray-200 rounded-lg p-4")
+              if item.image
+                div(class="mb-4 h-40 flex items-center justify-center")
+                  img(src=item.image alt=item.title class="max-h-full max-w-full")
+              h3(class="text-lg font-medium mb-2") #{item.title}
+              p(class="text-gray-600 mb-4 text-sm") #{item.content}
+              div(class="flex space-x-2 mt-2")
+                a(href=`/admin/landing/edit/${item.id}` class="text-indigo-600 hover:text-indigo-900" title="Edit")
+                  i(class="bx bx-edit mr-1")
+                  span Edit
+                a(href=`/admin/landing/delete/${item.id}` class="text-red-600 hover:text-red-900" title="Delete" onclick="return confirm('Are you sure you want to delete this content?')")
+                  i(class="bx bx-trash mr-1")
+                  span Delete
+      else
+        div(class="text-center py-4 border border-dashed border-gray-300 rounded-lg")
+          p(class="text-gray-500") No feature content added yet
+    
+    div(class="bg-white rounded-lg shadow-md p-6" data-aos="fade-up" data-aos-delay="200")
+      h2(class="text-xl font-semibold mb-4") Call to Action Section
+      
+      if content && content.filter(item => item.section === 'cta').length > 0
+        div(class="space-y-4")
+          each item in content.filter(item => item.section === 'cta')
+            div(class="border border-gray-200 rounded-lg p-4")
+              h3(class="text-lg font-medium mb-2") #{item.title}
+              p(class="text-gray-600 mb-4") #{item.content}
+              if item.button_text
+                div(class="mb-4")
+                  span(class="text-gray-500") Button: 
+                  span(class="ml-1 px-2 py-1 bg-gray-100 rounded text-sm") #{item.button_text}
+                  span(class="ml-2 text-gray-500") Link: 
+                  span(class="ml-1 text-indigo-600") #{item.button_link}
+              div(class="flex space-x-2 mt-2")
+                a(href=`/admin/landing/edit/${item.id}` class="text-indigo-600 hover:text-indigo-900" title="Edit")
+                  i(class="bx bx-edit mr-1")
+                  span Edit
+                a(href=`/admin/landing/delete/${item.id}` class="text-red-600 hover:text-red-900" title="Delete" onclick="return confirm('Are you sure you want to delete this content?')")
+                  i(class="bx bx-trash mr-1")
+                  span Delete
+      else
+        div(class="text-center py-4 border border-dashed border-gray-300 rounded-lg")
+          p(class="text-gray-500 mb-2") No CTA content added yet
+          a(href="/admin/landing/add" class="text-indigo-600 hover:text-indigo-800")
+            i(class="bx bx-plus mr-1")
+            span Add CTA Content 

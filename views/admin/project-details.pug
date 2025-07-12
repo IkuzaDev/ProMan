@@ -1,0 +1,136 @@
+extends ../layout
+
+block content
+  div(class="container mx-auto px-4 py-6")
+    if project
+      input(type="hidden" id="project-id" value=project.id)
+      
+      div(class="flex items-center mb-6")
+        a(href="/admin/projects" class="mr-4 text-indigo-600 hover:text-indigo-800")
+          i(class="bx bx-arrow-back text-xl")
+        h1(class="text-3xl font-bold") #{project.name}
+      
+      div(class="bg-white rounded-lg shadow-md p-6 mb-6" data-aos="fade-up")
+        div(class="grid grid-cols-1 md:grid-cols-2 gap-6")
+          div
+            h2(class="text-xl font-semibold mb-4") Project Details
+            div(class="space-y-3")
+              div
+                span(class="text-gray-500") Status:
+                span(class=`ml-2 px-2 py-1 rounded-full text-xs font-medium ${project.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`) #{project.status}
+              div
+                span(class="text-gray-500") Created by:
+                span(class="ml-2") #{project.creator_name}
+              div
+                span(class="text-gray-500") Start date:
+                span(class="ml-2") #{project.start_date ? new Date(project.start_date).toLocaleDateString() : 'Not set'}
+              div
+                span(class="text-gray-500") End date:
+                span(class="ml-2") #{project.end_date ? new Date(project.end_date).toLocaleDateString() : 'Not set'}
+              div
+                span(class="text-gray-500") Description:
+                p(class="mt-1 text-gray-700") #{project.description}
+          
+          div
+            h2(class="text-xl font-semibold mb-4") Progress
+            div(class="mb-2 flex justify-between")
+              span Progress
+              span #{progress ? progress.progress_percentage : 0}%
+            div(class="w-full bg-gray-200 rounded-full h-2.5 mb-4")
+              div(class="bg-indigo-600 h-2.5 rounded-full" style=`width: ${progress ? progress.progress_percentage : 0}%`)
+            
+            div(class="grid grid-cols-3 gap-4 mt-6")
+              div(class="bg-indigo-50 p-4 rounded-lg text-center")
+                div(class="text-2xl font-bold text-indigo-600") #{tasks ? tasks.length : 0}
+                div(class="text-xs text-gray-500") Total Tasks
+              div(class="bg-yellow-50 p-4 rounded-lg text-center")
+                div(class="text-2xl font-bold text-yellow-600") #{tasks ? tasks.filter(t => t.status === 'pending' || t.status === 'in_progress').length : 0}
+                div(class="text-xs text-gray-500") In Progress
+              div(class="bg-green-50 p-4 rounded-lg text-center")
+                div(class="text-2xl font-bold text-green-600") #{tasks ? tasks.filter(t => t.status === 'completed').length : 0}
+                div(class="text-xs text-gray-500") Completed
+      
+      div(class="bg-white rounded-lg shadow-md p-6 mb-6" data-aos="fade-up" data-aos-delay="100")
+        h2(class="text-xl font-semibold mb-4") Team Members
+        
+        if members && members.length > 0
+          div(class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4")
+            each member in members
+              div(class="flex items-center p-3 border border-gray-200 rounded-lg")
+                if member.avatar
+                  img(src=member.avatar alt=member.fullname class="h-10 w-10 rounded-full mr-3")
+                else
+                  div(class="h-10 w-10 rounded-full bg-indigo-100 text-indigo-500 flex items-center justify-center mr-3")
+                    i(class="bx bx-user")
+                div
+                  div(class="font-medium") #{member.fullname}
+                  div(class="text-sm text-gray-500") #{member.email}
+                  div(class="text-xs")
+                    span(class=`px-2 py-1 rounded-full ${member.project_role === 'manager' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}`) #{member.project_role}
+        else
+          p(class="text-gray-500") No team members assigned to this project
+      
+      div(class="bg-white rounded-lg shadow-md p-6" data-aos="fade-up" data-aos-delay="200")
+        h2(class="text-xl font-semibold mb-4") Tasks
+        
+        if tasks && tasks.length > 0
+          div(class="overflow-x-auto")
+            table(class="min-w-full divide-y divide-gray-200")
+              thead(class="bg-gray-50")
+                tr
+                  th(class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Task Name
+                  th(class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Status
+                  th(class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Priority
+                  th(class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Assigned To
+                  th(class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Progress
+                  th(class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Due Date
+              tbody(class="bg-white divide-y divide-gray-200")
+                each task in tasks
+                  tr(class="hover:bg-gray-50")
+                    td(class="px-6 py-4 whitespace-nowrap")
+                      div(class="font-medium text-gray-900") #{task.name}
+                    td(class="px-6 py-4 whitespace-nowrap")
+                      if task.status === 'pending'
+                        span(class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800") Pending
+                      else if task.status === 'in_progress'
+                        span(class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800") In Progress
+                      else
+                        span(class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800") Completed
+                    td(class="px-6 py-4 whitespace-nowrap")
+                      if task.priority === 'high'
+                        span(class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800") High
+                      else if task.priority === 'medium'
+                        span(class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-100 text-orange-800") Medium
+                      else
+                        span(class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800") Low
+                    td(class="px-6 py-4 whitespace-nowrap")
+                      if task.assignee_name
+                        div(class="flex items-center")
+                          if task.assignee_avatar
+                            img(src=task.assignee_avatar alt=task.assignee_name class="h-6 w-6 rounded-full mr-2")
+                          else
+                            div(class="h-6 w-6 rounded-full bg-indigo-100 text-indigo-500 flex items-center justify-center mr-2")
+                              i(class="bx bx-user text-xs")
+                          span #{task.assignee_name}
+                      else
+                        span(class="text-gray-500") Unassigned
+                    td(class="px-6 py-4 whitespace-nowrap")
+                      div(class="w-full bg-gray-200 rounded-full h-2.5 mb-1")
+                        div(class="bg-indigo-600 h-2.5 rounded-full" style=`width: ${task.progress}%`)
+                      span(class="text-xs text-gray-500") #{task.progress}%
+                    td(class="px-6 py-4 whitespace-nowrap text-sm text-gray-500")
+                      if task.due_date
+                        - const dueDate = new Date(task.due_date)
+                        - const today = new Date()
+                        - const isOverdue = dueDate < today && task.status !== 'completed'
+                        span(class=isOverdue ? 'text-red-600 font-medium' : '') #{dueDate.toLocaleDateString()}
+                        if isOverdue
+                          span(class="ml-1 text-xs text-red-600") (Overdue)
+                      else
+                        span No due date
+        else
+          p(class="text-gray-500") No tasks created for this project
+    else
+      div(class="text-center py-8")
+        p(class="text-gray-500 mb-4") Project not found
+        a(href="/admin/projects" class="text-indigo-600 hover:text-indigo-800") Back to Projects 

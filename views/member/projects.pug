@@ -1,0 +1,43 @@
+extends ../layout
+
+block content
+  div(class="container mx-auto px-4 py-6")
+    h1(class="text-3xl font-bold mb-6") My Projects
+    
+    if projects && projects.length > 0
+      div(class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6")
+        each project in projects
+          div(class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow duration-300" data-aos="fade-up")
+            div(class="p-6")
+              div(class="flex justify-between items-start mb-4")
+                h2(class="text-xl font-semibold text-gray-800") #{project.name}
+                span(class=`px-2 py-1 rounded-full text-xs font-medium ${project.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`) #{project.status}
+              
+              p(class="text-gray-600 mb-6 h-12 overflow-hidden") #{project.description}
+              
+              div(class="mb-4")
+                div(class="flex justify-between text-sm mb-1")
+                  span Progress
+                  span #{Math.round((project.completed_tasks / (project.task_count || 1)) * 100)}%
+                div(class="w-full bg-gray-200 rounded-full h-2")
+                  - const progressPercent = Math.round((project.completed_tasks / (project.task_count || 1)) * 100)
+                  div(class="bg-indigo-600 h-2 rounded-full" style=`width: ${progressPercent}%`)
+              
+              div(class="flex justify-between text-sm text-gray-500 mb-6")
+                div
+                  i(class="bx bx-calendar mr-1")
+                  span #{project.start_date ? new Date(project.start_date).toLocaleDateString() : 'No start date'}
+                div
+                  i(class="bx bx-task mr-1")
+                  span #{project.completed_tasks} / #{project.task_count} tasks
+              
+              div(class="flex justify-center")
+                a(href=`/member/projects/${project.id}` class="text-indigo-600 hover:text-indigo-800 flex items-center")
+                  i(class="bx bx-show mr-1")
+                  span View Details
+    else
+      div(class="bg-white rounded-lg shadow-md p-8 text-center" data-aos="fade-up")
+        div(class="mb-4 text-gray-400")
+          i(class="bx bx-folder-open text-6xl")
+        h3(class="text-xl font-medium text-gray-700 mb-2") No Projects Found
+        p(class="text-gray-500") You are not assigned to any projects yet. 

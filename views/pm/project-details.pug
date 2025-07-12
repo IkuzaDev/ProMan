@@ -1,0 +1,247 @@
+extends ../layout
+
+block content
+  div(class="container mx-auto px-4 py-6")
+    if project
+      input(type="hidden" id="project-id" value=project.id)
+      
+      div(class="flex items-center mb-6")
+        a(href="/pm/projects" class="mr-4 text-indigo-600 hover:text-indigo-800")
+          i(class="bx bx-arrow-back text-xl")
+        h1(class="text-3xl font-bold") #{project.name}
+      
+      div(class="flex flex-wrap gap-2 mb-6")
+        a(href=`/pm/projects/edit/${project.id}` class="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-lg flex items-center")
+          i(class="bx bx-edit mr-2")
+          span Edit Project
+        
+        a(href=`/pm/projects/${project.id}/members` class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg flex items-center")
+          i(class="bx bx-group mr-2")
+          span Manage Team
+        
+        a(href=`/pm/projects/${project.id}/tasks/create` class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg flex items-center")
+          i(class="bx bx-plus mr-2")
+          span Add Task
+      
+      div(class="bg-white rounded-lg shadow-md p-6 mb-6" data-aos="fade-up")
+        div(class="grid grid-cols-1 md:grid-cols-2 gap-6")
+          div
+            h2(class="text-xl font-semibold mb-4") Project Details
+            div(class="space-y-3")
+              div
+                span(class="text-gray-500") Status:
+                span(class=`ml-2 px-2 py-1 rounded-full text-xs font-medium ${project.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`) #{project.status}
+              div
+                span(class="text-gray-500") Created by:
+                span(class="ml-2") #{project.creator_name}
+              div
+                span(class="text-gray-500") Start date:
+                span(class="ml-2") #{project.start_date ? new Date(project.start_date).toLocaleDateString() : 'Not set'}
+              div
+                span(class="text-gray-500") End date:
+                span(class="ml-2") #{project.end_date ? new Date(project.end_date).toLocaleDateString() : 'Not set'}
+              div
+                span(class="text-gray-500") Description:
+                p(class="mt-1 text-gray-700") #{project.description}
+          
+          div
+            h2(class="text-xl font-semibold mb-4") Progress
+            div(class="mb-2 flex justify-between")
+              span Progress
+              span #{progress ? progress.progress_percentage : 0}%
+            div(class="w-full bg-gray-200 rounded-full h-2.5 mb-4")
+              div(class="bg-indigo-600 h-2.5 rounded-full" style=`width: ${progress ? progress.progress_percentage : 0}%`)
+            
+            div(class="grid grid-cols-3 gap-4 mt-6")
+              div(class="bg-indigo-50 p-4 rounded-lg text-center")
+                div(class="text-2xl font-bold text-indigo-600") #{tasks ? tasks.length : 0}
+                div(class="text-xs text-gray-500") Total Tasks
+              div(class="bg-yellow-50 p-4 rounded-lg text-center")
+                div(class="text-2xl font-bold text-yellow-600") #{tasks ? tasks.filter(t => t.status === 'pending' || t.status === 'in_progress').length : 0}
+                div(class="text-xs text-gray-500") In Progress
+              div(class="bg-green-50 p-4 rounded-lg text-center")
+                div(class="text-2xl font-bold text-green-600") #{tasks ? tasks.filter(t => t.status === 'completed').length : 0}
+                div(class="text-xs text-gray-500") Completed
+      
+      div(class="bg-white rounded-lg shadow-md p-6 mb-6" data-aos="fade-up" data-aos-delay="100")
+        div(class="flex justify-between items-center mb-4")
+          h2(class="text-xl font-semibold") Team Members
+          a(href=`/pm/projects/${project.id}/members` class="text-indigo-600 hover:text-indigo-800 flex items-center")
+            i(class="bx bx-plus mr-1")
+            span Add Member
+        
+        if members && members.length > 0
+          div(class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4")
+            each member in members
+              div(class="flex items-center p-3 border border-gray-200 rounded-lg")
+                if member.avatar
+                  img(src=member.avatar alt=member.fullname class="h-10 w-10 rounded-full mr-3")
+                else
+                  div(class="h-10 w-10 rounded-full bg-indigo-100 text-indigo-500 flex items-center justify-center mr-3")
+                    i(class="bx bx-user")
+                div(class="flex-1")
+                  div(class="font-medium") #{member.fullname}
+                  div(class="text-sm text-gray-500") #{member.email}
+                  div(class="text-xs")
+                    span(class=`px-2 py-1 rounded-full ${member.project_role === 'manager' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}`) #{member.project_role}
+        else
+          p(class="text-gray-500") No team members assigned to this project
+      
+      div(class="mb-6" data-aos="fade-up" data-aos-delay="200")
+        h2(class="text-xl font-semibold mb-4") Tasks
+        
+        if tasks && tasks.length > 0
+          div(class="grid grid-cols-1 lg:grid-cols-3 gap-6" id="kanban-board")
+            div(class="bg-white rounded-lg shadow-md overflow-hidden kanban-column" data-status="pending")
+              div(class="bg-yellow-50 px-6 py-3 border-b border-yellow-100")
+                h3(class="font-medium text-yellow-800") Pending
+              div(class="p-4 h-full overflow-y-auto kanban-tasks" style="min-height: 300px; max-height: 600px;")
+                each task in pendingTasks
+                  div(class="bg-white border border-gray-200 rounded-lg p-4 mb-3 shadow-sm hover:shadow-md transition-shadow kanban-task task-card" id=`task-${task.id}` data-task-id=task.id)
+                    div(class="flex justify-between items-start")
+                      a(href=`/pm/projects/${project.id}/tasks/${task.id}` class="font-medium text-gray-900 task-name") #{task.name}
+                      span(class="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 status-badge") Pending
+                    
+                    if task.description
+                      p(class="text-gray-600 text-sm mt-2 task-description") #{task.description.length > 100 ? task.description.substring(0, 100) + '...' : task.description}
+                    
+                    div(class="mt-3")
+                      span(class="text-xs text-gray-500") Priority:
+                      if task.priority === 'high'
+                        span(class="ml-1 px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800") High
+                      else if task.priority === 'medium'
+                        span(class="ml-1 px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800") Medium
+                      else
+                        span(class="ml-1 px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800") Low
+                    
+                    div(class="flex justify-between items-center mt-3")
+                      if task.assignee_name
+                        div(class="flex items-center")
+                          if task.assignee_avatar
+                            img(src=task.assignee_avatar alt=task.assignee_name class="h-6 w-6 rounded-full mr-1")
+                          else
+                            div(class="h-6 w-6 rounded-full bg-indigo-100 text-indigo-500 flex items-center justify-center mr-1")
+                              i(class="bx bx-user text-xs")
+                          span(class="text-xs text-gray-500") #{task.assignee_name}
+                      else
+                        span(class="text-xs text-gray-500") Unassigned
+                      
+                      if task.due_date
+                        - const dueDate = new Date(task.due_date)
+                        - const today = new Date()
+                        - const isOverdue = dueDate < today
+                        span(class=`text-xs ${isOverdue ? 'text-red-600 font-medium' : 'text-gray-500'}`)
+                          i(class="bx bx-calendar mr-1")
+                          | #{dueDate.toLocaleDateString()}
+                    
+                    div(class="mt-3")
+                      div(class="w-full bg-gray-200 rounded-full h-1.5")
+                        div(class="bg-indigo-600 h-1.5 rounded-full progress-bar" style=`width: ${task.progress}%`)
+                      div(class="flex justify-end mt-1")
+                        span(class="text-xs text-gray-500 progress-text") #{task.progress}%
+            
+            div(class="bg-white rounded-lg shadow-md overflow-hidden kanban-column" data-status="in_progress")
+              div(class="bg-blue-50 px-6 py-3 border-b border-blue-100")
+                h3(class="font-medium text-blue-800") In Progress
+              div(class="p-4 h-full overflow-y-auto kanban-tasks" style="min-height: 300px; max-height: 600px;")
+                each task in inProgressTasks
+                  div(class="bg-white border border-gray-200 rounded-lg p-4 mb-3 shadow-sm hover:shadow-md transition-shadow kanban-task task-card" id=`task-${task.id}` data-task-id=task.id)
+                    div(class="flex justify-between items-start")
+                      a(href=`/pm/projects/${project.id}/tasks/${task.id}` class="font-medium text-gray-900 task-name") #{task.name}
+                      span(class="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 status-badge") In Progress
+                    
+                    if task.description
+                      p(class="text-gray-600 text-sm mt-2 task-description") #{task.description.length > 100 ? task.description.substring(0, 100) + '...' : task.description}
+                    
+                    div(class="mt-3")
+                      span(class="text-xs text-gray-500") Priority:
+                      if task.priority === 'high'
+                        span(class="ml-1 px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800") High
+                      else if task.priority === 'medium'
+                        span(class="ml-1 px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800") Medium
+                      else
+                        span(class="ml-1 px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800") Low
+                    
+                    div(class="flex justify-between items-center mt-3")
+                      if task.assignee_name
+                        div(class="flex items-center")
+                          if task.assignee_avatar
+                            img(src=task.assignee_avatar alt=task.assignee_name class="h-6 w-6 rounded-full mr-1")
+                          else
+                            div(class="h-6 w-6 rounded-full bg-indigo-100 text-indigo-500 flex items-center justify-center mr-1")
+                              i(class="bx bx-user text-xs")
+                          span(class="text-xs text-gray-500") #{task.assignee_name}
+                      else
+                        span(class="text-xs text-gray-500") Unassigned
+                      
+                      if task.due_date
+                        - const dueDate = new Date(task.due_date)
+                        - const today = new Date()
+                        - const isOverdue = dueDate < today
+                        span(class=`text-xs ${isOverdue ? 'text-red-600 font-medium' : 'text-gray-500'}`)
+                          i(class="bx bx-calendar mr-1")
+                          | #{dueDate.toLocaleDateString()}
+                    
+                    div(class="mt-3")
+                      div(class="w-full bg-gray-200 rounded-full h-1.5")
+                        div(class="bg-indigo-600 h-1.5 rounded-full progress-bar" style=`width: ${task.progress}%`)
+                      div(class="flex justify-end mt-1")
+                        span(class="text-xs text-gray-500 progress-text") #{task.progress}%
+            
+            div(class="bg-white rounded-lg shadow-md overflow-hidden kanban-column" data-status="completed")
+              div(class="bg-green-50 px-6 py-3 border-b border-green-100")
+                h3(class="font-medium text-green-800") Completed
+              div(class="p-4 h-full overflow-y-auto kanban-tasks" style="min-height: 300px; max-height: 600px;")
+                each task in completedTasks
+                  div(class="bg-white border border-gray-200 rounded-lg p-4 mb-3 shadow-sm hover:shadow-md transition-shadow kanban-task task-card" id=`task-${task.id}` data-task-id=task.id)
+                    div(class="flex justify-between items-start")
+                      a(href=`/pm/projects/${project.id}/tasks/${task.id}` class="font-medium text-gray-900 task-name") #{task.name}
+                      span(class="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 status-badge") Completed
+                    
+                    if task.description
+                      p(class="text-gray-600 text-sm mt-2 task-description") #{task.description.length > 100 ? task.description.substring(0, 100) + '...' : task.description}
+                    
+                    div(class="mt-3")
+                      span(class="text-xs text-gray-500") Priority:
+                      if task.priority === 'high'
+                        span(class="ml-1 px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800") High
+                      else if task.priority === 'medium'
+                        span(class="ml-1 px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800") Medium
+                      else
+                        span(class="ml-1 px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800") Low
+                    
+                    div(class="flex justify-between items-center mt-3")
+                      if task.assignee_name
+                        div(class="flex items-center")
+                          if task.assignee_avatar
+                            img(src=task.assignee_avatar alt=task.assignee_name class="h-6 w-6 rounded-full mr-1")
+                          else
+                            div(class="h-6 w-6 rounded-full bg-indigo-100 text-indigo-500 flex items-center justify-center mr-1")
+                              i(class="bx bx-user text-xs")
+                          span(class="text-xs text-gray-500") #{task.assignee_name}
+                      else
+                        span(class="text-xs text-gray-500") Unassigned
+                      
+                      if task.due_date
+                        span(class="text-xs text-gray-500")
+                          i(class="bx bx-calendar mr-1")
+                          | #{new Date(task.due_date).toLocaleDateString()}
+                    
+                    div(class="mt-3")
+                      div(class="w-full bg-gray-200 rounded-full h-1.5")
+                        div(class="bg-indigo-600 h-1.5 rounded-full progress-bar" style="width: 100%")
+                      div(class="flex justify-end mt-1")
+                        span(class="text-xs text-gray-500 progress-text") 100%
+        else
+          div(class="bg-white rounded-lg shadow-md p-8 text-center")
+            div(class="mb-4 text-gray-400")
+              i(class="bx bx-task text-6xl")
+            h3(class="text-xl font-medium text-gray-700 mb-2") No Tasks Found
+            p(class="text-gray-500 mb-6") This project doesn't have any tasks yet.
+            a(href=`/pm/projects/${project.id}/tasks/create` class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700")
+              i(class="bx bx-plus mr-2")
+              span Create First Task
+    else
+      div(class="text-center py-8")
+        p(class="text-gray-500 mb-4") Project not found
+        a(href="/pm/projects" class="text-indigo-600 hover:text-indigo-800") Back to Projects 

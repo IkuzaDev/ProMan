@@ -1,0 +1,91 @@
+extends layout
+
+block content
+  div(class="container mx-auto px-4 py-16")
+    section(class="flex flex-col-reverse md:flex-row items-center justify-between mb-16")
+      div(class="md:w-1/2 lg:pr-16" data-aos="fade-right")
+        if hero
+          h1(class="text-4xl md:text-5xl font-bold mb-6 leading-tight") #{hero.title}
+          p(class="text-lg text-gray-600 mb-8") #{hero.content}
+          a(href=hero.button_link class="inline-flex items-center px-6 py-3 rounded-lg text-white font-medium transition-all" style="background-image: var(--primary-gradient)")
+            span #{hero.button_text}
+            i(class="bx bx-right-arrow-alt ml-2")
+        else
+          h1(class="text-4xl md:text-5xl font-bold mb-6 leading-tight") Project Management Made Simple
+          p(class="text-lg text-gray-600 mb-8") ProMan helps teams organize work efficiently and deliver projects on time.
+          a(href="/auth/register" class="inline-flex items-center px-6 py-3 rounded-lg text-white font-medium transition-all" style="background-image: var(--primary-gradient)")
+            span Get Started
+            i(class="bx bx-right-arrow-alt ml-2")
+      
+      div(class="md:w-1/2 mb-8 md:mb-0" data-aos="fade-left")
+        if hero && hero.image
+          img(src=hero.image alt="Hero illustration" class="w-full h-auto")
+        else
+          img(src="/images/hero.svg" alt="Hero illustration" class="w-full h-auto")
+    
+    section(class="py-12" id="features")
+      div(class="text-center mb-12" data-aos="fade-up")
+        h2(class="text-3xl font-bold mb-4") Features
+        p(class="text-lg text-gray-600 max-w-2xl mx-auto") Everything you need to manage projects effectively
+      
+      div(class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8")
+        if features && features.length
+          each feature in features
+            div(class="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300" data-aos="fade-up")
+              div(class="mb-4 h-16")
+                if feature.image
+                  img(src=feature.image alt=feature.title class="h-full w-auto mx-auto")
+                else
+                  div(class="h-16 w-16 mx-auto rounded-full flex items-center justify-center" style="background-image: var(--primary-gradient)")
+                    i(class="bx bx-check-shield text-2xl text-white")
+              h3(class="text-xl font-bold mb-2") #{feature.title}
+              p(class="text-gray-600 mb-4") #{feature.content}
+              if feature.button_link
+                a(href=feature.button_link class="inline-flex items-center text-indigo-600 hover:text-indigo-800")
+                  span #{feature.button_text || 'Learn more'}
+                  i(class="bx bx-right-arrow-alt ml-1")
+        else
+          div(class="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300" data-aos="fade-up")
+            div(class="mb-4 h-16")
+              div(class="h-16 w-16 mx-auto rounded-full flex items-center justify-center" style="background-image: var(--primary-gradient)")
+                i(class="bx bx-task text-2xl text-white")
+            h3(class="text-xl font-bold mb-2") Task Tracking
+            p(class="text-gray-600 mb-4") Easily track task progress and status in real-time.
+            a(href="/auth/register" class="inline-flex items-center text-indigo-600 hover:text-indigo-800")
+              span Learn more
+              i(class="bx bx-right-arrow-alt ml-1")
+              
+          div(class="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300" data-aos="fade-up" data-aos-delay="100")
+            div(class="mb-4 h-16")
+              div(class="h-16 w-16 mx-auto rounded-full flex items-center justify-center" style="background-image: var(--primary-gradient)")
+                i(class="bx bx-group text-2xl text-white")
+            h3(class="text-xl font-bold mb-2") Team Collaboration
+            p(class="text-gray-600 mb-4") Collaborate with your team members seamlessly.
+            a(href="/auth/register" class="inline-flex items-center text-indigo-600 hover:text-indigo-800")
+              span Learn more
+              i(class="bx bx-right-arrow-alt ml-1")
+              
+          div(class="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300" data-aos="fade-up" data-aos-delay="200")
+            div(class="mb-4 h-16")
+              div(class="h-16 w-16 mx-auto rounded-full flex items-center justify-center" style="background-image: var(--primary-gradient)")
+                i(class="bx bx-bar-chart-alt-2 text-2xl text-white")
+            h3(class="text-xl font-bold mb-2") Project Analytics
+            p(class="text-gray-600 mb-4") Get insights into project performance and team productivity.
+            a(href="/auth/register" class="inline-flex items-center text-indigo-600 hover:text-indigo-800")
+              span Learn more
+              i(class="bx bx-right-arrow-alt ml-1")
+    
+    section(class="py-16 my-12 rounded-2xl" style="background-image: var(--primary-gradient)" data-aos="fade-up")
+      div(class="text-center px-4")
+        if cta
+          h2(class="text-3xl font-bold mb-4 text-white") #{cta.title}
+          p(class="text-xl text-white/90 max-w-2xl mx-auto mb-8") #{cta.content}
+          a(href=cta.button_link class="inline-flex items-center px-6 py-3 bg-white text-indigo-600 rounded-lg font-medium hover:bg-gray-100 transition-all")
+            span #{cta.button_text}
+            i(class="bx bx-right-arrow-alt ml-2")
+        else
+          h2(class="text-3xl font-bold mb-4 text-white") Ready to boost your team productivity?
+          p(class="text-xl text-white/90 max-w-2xl mx-auto mb-8") Start using ProMan today and see the difference in how your projects are managed.
+          a(href="/auth/register" class="inline-flex items-center px-6 py-3 bg-white text-indigo-600 rounded-lg font-medium hover:bg-gray-100 transition-all")
+            span Sign Up Now
+            i(class="bx bx-right-arrow-alt ml-2") 

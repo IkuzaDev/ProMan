@@ -1,0 +1,75 @@
+extends ../layout
+
+block content
+  div(class="container mx-auto px-4 py-6")
+    if project
+      div(class="flex items-center mb-6")
+        a(href=`/pm/projects/${project.id}` class="mr-4 text-indigo-600 hover:text-indigo-800")
+          i(class="bx bx-arrow-back text-xl")
+        h1(class="text-3xl font-bold") Manage Team: #{project.name}
+      
+      div(class="bg-white rounded-lg shadow-md p-6 mb-6" data-aos="fade-up")
+        h2(class="text-xl font-semibold mb-4") Current Team Members
+        
+        if members && members.length > 0
+          div(class="overflow-x-auto")
+            table(class="min-w-full divide-y divide-gray-200")
+              thead(class="bg-gray-50")
+                tr
+                  th(class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Member
+                  th(class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Email
+                  th(class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Role
+                  th(class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider") Actions
+              tbody(class="bg-white divide-y divide-gray-200")
+                each member in members
+                  tr(class="hover:bg-gray-50")
+                    td(class="px-6 py-4 whitespace-nowrap")
+                      div(class="flex items-center")
+                        if member.avatar
+                          img(src=member.avatar alt=member.fullname class="h-8 w-8 rounded-full mr-2")
+                        else
+                          div(class="h-8 w-8 rounded-full bg-indigo-100 text-indigo-500 flex items-center justify-center mr-2")
+                            i(class="bx bx-user")
+                        span(class="font-medium") #{member.fullname}
+                    td(class="px-6 py-4 whitespace-nowrap") #{member.email}
+                    td(class="px-6 py-4 whitespace-nowrap")
+                      if member.project_role === 'manager'
+                        span(class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800") Project Manager
+                      else
+                        span(class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800") Team Member
+                    td(class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium")
+                      if member.id !== user.id && member.project_role !== 'manager'
+                        a(href=`/pm/projects/${project.id}/members/remove/${member.id}` class="text-red-600 hover:text-red-900" onclick="return confirm('Are you sure you want to remove this member from the project?')")
+                          i(class="bx bx-user-x mr-1")
+                          span Remove
+        else
+          p(class="text-gray-500") No team members assigned to this project yet.
+      
+      div(class="bg-white rounded-lg shadow-md p-6" data-aos="fade-up" data-aos-delay="100")
+        h2(class="text-xl font-semibold mb-4") Add Team Member
+        
+        form(action=`/pm/projects/${project.id}/members` method="POST")
+          div(class="grid grid-cols-1 md:grid-cols-2 gap-6")
+            div(class="mb-4")
+              label(for="user_id" class="block text-sm font-medium text-gray-700 mb-1") Select User *
+              select(id="user_id" name="user_id" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500")
+                option(value="") -- Select User --
+                if availableUsers && availableUsers.length > 0
+                  each user in availableUsers
+                    option(value=user.id) #{user.fullname} (#{user.email})
+                else
+                  option(value="" disabled) No available users
+            
+            div(class="mb-4")
+              label(for="role" class="block text-sm font-medium text-gray-700 mb-1") Role *
+              select(id="role" name="role" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500")
+                option(value="") -- Select Role --
+                option(value="manager") Project Manager
+                option(value="member") Team Member
+          
+          div(class="mt-6 flex justify-end")
+            button(type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-lg") Add Member
+    else
+      div(class="text-center py-8")
+        p(class="text-gray-500 mb-4") Project not found
+        a(href="/pm/projects" class="text-indigo-600 hover:text-indigo-800") Back to Projects 

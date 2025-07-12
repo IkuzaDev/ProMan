@@ -1,0 +1,108 @@
+extends ../layout
+
+block content
+  div(class="container mx-auto px-4 py-6")
+    h1(class="text-3xl font-bold mb-8") Project Manager Dashboard
+    div(class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8")
+      div(class="bg-white rounded-lg shadow-md p-6 border border-gray-100" data-aos="fade-up")
+        div(class="flex items-center justify-between mb-4")
+          h2(class="text-lg font-semibold text-gray-700") Projects
+          span(class="p-2 bg-blue-100 rounded-full text-blue-500")
+            i(class="bx bx-briefcase text-xl")
+        div(class="text-3xl font-bold text-gray-800") #{projects ? projects.length : 0}
+        div(class="mt-2 flex space-x-2 text-sm")
+          span(class="bg-green-100 text-green-600 px-2 py-1 rounded-md") #{activeProjects || 0} Active
+          span(class="bg-gray-100 text-gray-600 px-2 py-1 rounded-md") #{completedProjects || 0} Completed
+      
+      div(class="bg-white rounded-lg shadow-md p-6 border border-gray-100" data-aos="fade-up" data-aos-delay="100")
+        div(class="flex items-center justify-between mb-4")
+          h2(class="text-lg font-semibold text-gray-700") Overall Progress
+          span(class="p-2 bg-green-100 rounded-full text-green-500")
+            i(class="bx bx-line-chart text-xl")
+        div(class="text-3xl font-bold text-gray-800") #{totalProgress || 0}%
+        div(class="w-full bg-gray-200 rounded-full h-2.5 mt-3 overflow-hidden")
+          div(class="bg-green-500 h-2.5 rounded-full" style=`width: ${totalProgress || 0}%`)
+      
+      div(class="bg-white rounded-lg shadow-md p-6 border border-gray-100" data-aos="fade-up" data-aos-delay="200")
+        div(class="flex items-center justify-between mb-4")
+          h2(class="text-lg font-semibold text-gray-700") My Tasks
+          span(class="p-2 bg-indigo-100 rounded-full text-indigo-500")
+            i(class="bx bx-task text-xl")
+        div(class="text-3xl font-bold text-gray-800") #{assignedTasks ? assignedTasks.length : 0}
+        div(class="mt-2 flex space-x-2 text-sm")
+          if assignedTasks && assignedTasks.length > 0
+            - const pendingCount = assignedTasks.filter(t => t.status === 'pending').length
+            - const progressCount = assignedTasks.filter(t => t.status === 'in_progress').length
+            - const completedCount = assignedTasks.filter(t => t.status === 'completed').length
+            span(class="bg-yellow-100 text-yellow-600 px-2 py-1 rounded-md") #{pendingCount} Pending
+            span(class="bg-blue-100 text-blue-600 px-2 py-1 rounded-md") #{progressCount} In Progress
+            span(class="bg-green-100 text-green-600 px-2 py-1 rounded-md") #{completedCount} Completed
+          else
+            span(class="text-gray-500") No tasks assigned
+    
+    div(class="grid grid-cols-1 lg:grid-cols-2 gap-6")
+      div(class="bg-white rounded-lg shadow-md overflow-hidden" data-aos="fade-up" data-aos-delay="300")
+        div(class="px-6 py-4 border-b border-gray-200 flex justify-between items-center")
+          h2(class="text-xl font-semibold") My Projects
+          a(href="/pm/projects/create" class="text-indigo-600 hover:text-indigo-800 flex items-center")
+            i(class="bx bx-plus mr-1")
+            span Create New
+        
+        if projects && projects.length > 0
+          div(class="divide-y divide-gray-200")
+            each project in projects.slice(0, 5)
+              div(class="p-4 hover:bg-gray-50")
+                div(class="flex justify-between items-start")
+                  a(href=`/pm/projects/${project.id}` class="text-lg font-medium text-indigo-600 hover:text-indigo-800") #{project.name}
+                  span(class=`px-2 py-1 rounded-full text-xs font-medium ${project.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`) #{project.status}
+                p(class="text-gray-600 text-sm mt-1 mb-2") #{project.description && project.description.length > 100 ? project.description.substring(0, 100) + '...' : project.description}
+                div(class="flex justify-between items-center mt-3")
+                  div(class="flex items-center")
+                    span(class="text-xs text-gray-500") Progress:
+                    div(class="w-32 bg-gray-200 rounded-full h-2 ml-2")
+                      - const progressPercent = Math.round((project.completed_tasks / (project.task_count || 1)) * 100)
+                      div(class="bg-indigo-600 h-2 rounded-full" style=`width: ${progressPercent}%`)
+                  span(class="text-xs text-gray-500") #{project.completed_tasks} / #{project.task_count} tasks
+          
+          div(class="p-4 text-center")
+            a(href="/pm/projects" class="text-indigo-600 hover:text-indigo-800") View All Projects
+        else
+          div(class="p-8 text-center")
+            p(class="text-gray-500 mb-4") No projects found
+            a(href="/pm/projects/create" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700")
+              i(class="bx bx-plus mr-2")
+              span Create Your First Project
+      
+      // Recent Tasks
+      div(class="bg-white rounded-lg shadow-md overflow-hidden" data-aos="fade-up" data-aos-delay="400")
+        div(class="px-6 py-4 border-b border-gray-200")
+          h2(class="text-xl font-semibold") Recent Tasks
+        
+        if recentTasks && recentTasks.length > 0
+          div(class="divide-y divide-gray-200")
+            each task in recentTasks
+              div(class="p-4 hover:bg-gray-50")
+                div(class="flex justify-between items-start")
+                  a(href=`/pm/projects/${task.project_id}/tasks/${task.id}` class="font-medium text-gray-900") #{task.name}
+                  if task.status === 'pending'
+                    span(class="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800") Pending
+                  else if task.status === 'in_progress'
+                    span(class="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800") In Progress
+                  else
+                    span(class="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800") Completed
+                div(class="flex items-center mt-2")
+                  span(class="text-xs text-gray-500 mr-2") Project:
+                  a(href=`/pm/projects/${task.project_id}` class="text-xs text-indigo-600") #{task.project_name}
+                
+                div(class="w-full bg-gray-200 rounded-full h-1.5 mt-3")
+                  div(class="bg-indigo-600 h-1.5 rounded-full" style=`width: ${task.progress}%`)
+                div(class="flex justify-between text-xs text-gray-500 mt-1")
+                  span #{task.progress}% complete
+                  if task.due_date
+                    - const dueDate = new Date(task.due_date)
+                    - const today = new Date()
+                    - const isOverdue = dueDate < today && task.status !== 'completed'
+                    span(class=isOverdue ? 'text-red-600 font-medium' : '') Due: #{dueDate.toLocaleDateString()}
+        else
+          div(class="p-8 text-center")
+            p(class="text-gray-500") No recent tasks found 
