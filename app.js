@@ -7,6 +7,7 @@ const flash = require('connect-flash');
 const cookieParser = require('cookie-parser');
 const http = require('http');
 const socketIo = require('socket.io');
+const rateLimit = require('express-rate-limit');
 
 // Routes
 const authRoutes = require('./routes/auth');
@@ -19,6 +20,10 @@ const landingRoutes = require('./routes/landing');
 const { checkAuth } = require('./middleware/auth');
 
 const app = express();
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100
+});
 const server = http.createServer(app);
 const io = socketIo(server);
 
@@ -31,6 +36,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(limiter);
 app.use(session({
   store: new SQLiteStore({
     db: 'sessions.sqlite',
