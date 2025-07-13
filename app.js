@@ -8,7 +8,9 @@ const cookieParser = require('cookie-parser');
 const http = require('http');
 const socketIo = require('socket.io');
 const {rateLimit} = require('express-rate-limit');
+const UAParser = require('ua-parser-js');
 
+const allowlist = ['192.168.0.56', '192.168.0.21']; //TODO: ubah agar whitelist ip di ambil dari file json/database
 // Routes
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
@@ -23,7 +25,14 @@ const app = express();
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, //15 minutes
   max: 100,
-  message: "Slow down Dude!"
+  message: "Slow down Dude!",
+  skip: (req, res) => {
+    const parser = new UAParser();
+    const ua = req.headers['user-agent'];
+    const result = parser.setUA(ua).getResult();
+    console.warn(`Requests From ${req.ip} -> ${req.method} ${req.originalUrl} (${result.browser.name}:${result.browser.version} || ${result.os.name}:${result.os.version} || ${result.engine.name}:${result.engine.version})`); 
+    return allowlist.includes(req.ip);
+  },
 });
 const server = http.createServer(app);
 const io = socketIo(server);
