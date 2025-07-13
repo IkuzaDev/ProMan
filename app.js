@@ -7,7 +7,7 @@ const flash = require('connect-flash');
 const cookieParser = require('cookie-parser');
 const http = require('http');
 const socketIo = require('socket.io');
-const rateLimit = require('express-rate-limit');
+const {rateLimit, ipKeyGenerator} = require('express-rate-limit');
 
 // Routes
 const authRoutes = require('./routes/auth');
@@ -21,8 +21,10 @@ const { checkAuth } = require('./middleware/auth');
 
 const app = express();
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100
+  windowMs: 15 * 60 * 1000, //15 minutes
+  max: 100,
+  message: "Slow down Dude!",
+  keyGenerator: (req, res) => ipKeyGenerator(req.ip)
 });
 const server = http.createServer(app);
 const io = socketIo(server);
